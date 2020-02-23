@@ -4,11 +4,33 @@
 from cwltool.job import JobBase
 from cwltool.command_line_tool import CommandLineTool
 import json
+import functools
 
 ## Define custom JobBase class with a run method 
 ## that interates over the exec profile functions:
 
 class CustomExecProfileJob(JobBase):
+    def __init__(
+        self,
+        builder,   # type: Builder
+        joborder,  # type: Dict[Text, Union[Dict[Text, Any], List, Text, None]]
+        make_path_mapper,  # type: Callable[..., PathMapper]
+        requirements,  # type: List[Dict[Text, Text]]
+        hints,  # type: List[Dict[Text, Text]]
+        name,   # type: Text
+        # custom parameters:
+        tool # tool object
+    ):  # type: (...) -> None
+        super().__init__(self,
+                 builder=builder,
+                 joborder=joborder,
+                 make_path_mapper=make_path_mapper,
+                 requirements=requirements,
+                 hints=hints,
+                 name=name
+        )
+        self.tool = tool
+
     def run(
         self,
         runtimeContext     # type: RuntimeContext
@@ -36,35 +58,17 @@ class CustomExecProfileJob(JobBase):
             self.output_callback(outputs, processStatus)
 
 
-## Overwrite the make_job_runner in the CommandLineTool class
-## so that it always returns the CustomExecProfileJob class:
+## Custom CommandLineTool class:
+class CustomCommandlineTool(CommandLineTool):
+    
+    # Overwrite the make_job_runner
+    # so that it always returns the CustomExecProfileJob class:
+    def make_job_runner(self,
+        runtimeContext       # type: RuntimeContext
+    ):  # type: (...) -> Type[JobBase]
 
-def make_job_runner(self,
-    runtimeContext       # type: RuntimeContext
-):  # type: (...) -> Type[JobBase]
-    return( CustomExecProfileJob )
 
-CommandLineTool.make_job_runner = make_job_runner
-
-
-## Adapt the job function of the CommandLineTool class
-## so that self.tool is set on the job object and
-## is therefore available in the exec profile functions:
-
-prepare_job = CommandLineTool.job
-
-def job(self,
-            job_order,         # type: Dict[Text, Text]
-            output_callbacks,  # type: Callable[[Any, Any], Any]
-            runtimeContext     # type: RuntimeContext
-):
-    prep_j = prepare_job(self,
-            job_order,
-            output_callbacks,
-            runtimeContext
-    )
-    for j in prep_j:
-        j.tool = self.tool
-        yield j
-
-CommandLineTool.job = job
+        return functools.partial(
+            CustomExecProfileJob, 
+            tool=self.tool # bind tool object to job
+        )
