@@ -1,37 +1,14 @@
-# import cwltool.factory
-# from cwltool.job import JobBase
-# from cwltool.command_line_tool import CommandLineTool
+# This module makes adaptions to the CommandLineTool class of cwltool.command_line_tool
+# so that tool execution is handle via the functions defined in the execution profile.
 
-import sys
+from cwltool.job import JobBase
+from cwltool.command_line_tool import CommandLineTool
 import json
-import importlib.util
-spec = importlib.util.find_spec('cwltool')
-_cwltool_ = importlib.util.module_from_spec(spec)
-sys.modules['_cwltool_'] = _cwltool_
 
+## Define custom JobBase class with a run method 
+## that interates over the exec profile functions:
 
-
-import sys
-import importlib.util
-import cwltool
-
-SPEC_CWLTOOL = importlib.util.find_spec('cwltool')
-cwltool_ = importlib.util.module_from_spec(SPEC_CWLTOOL)
-SPEC_CWLTOOL.loader.exec_module(cwltool_)
-sys.modules['cwltool_'] = cwltool_
-del SPEC_CWLTOOL
-
-
-cwltool_.co
-
-assert os1 is not os2, \
-    "Module `os` instancing failed"
-
-
-
-
-###########################################################
-class CustomExecProfileJob(_cwltool_.job.JobBase):
+class CustomExecProfileJob(JobBase):
     def run(
         self,
         runtimeContext     # type: RuntimeContext
@@ -58,16 +35,23 @@ class CustomExecProfileJob(_cwltool_.job.JobBase):
         with runtimeContext.workflow_eval_lock:
             self.output_callback(outputs, processStatus)
 
+
+## Overwrite the make_job_runner in the CommandLineTool class
+## so that it always returns the CustomExecProfileJob class:
+
 def make_job_runner(self,
     runtimeContext       # type: RuntimeContext
 ):  # type: (...) -> Type[JobBase]
     return( CustomExecProfileJob )
 
-_cwltool_.command_line_tool.CommandLineTool.make_job_runner = make_job_runner
+CommandLineTool.make_job_runner = make_job_runner
 
-####################################################################
 
-prepare_job = _cwltool_.CommandLineTool.job
+## Adapt the job function of the CommandLineTool class
+## so that self.tool is set on the job object and
+## is therefore available in the exec profile functions:
+
+prepare_job = CommandLineTool.job
 
 def job(self,
             job_order,         # type: Dict[Text, Text]
@@ -83,10 +67,4 @@ def job(self,
         j.tool = self.tool
         yield j
 
-_cwltool_.CommandLineTool.job = job
-
-#######################################
-
-fac = _cwltool_.factory.Factory()
-touch = fac.make("touch.cwl")
-result = touch(filename="test")
+CommandLineTool.job = job
