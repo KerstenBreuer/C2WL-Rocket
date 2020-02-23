@@ -72,3 +72,10 @@ class CustomCommandlineTool(CommandLineTool):
             CustomExecProfileJob, 
             tool=self.tool # bind tool object to job
         )
+
+
+## custom tool creator function:
+def make_custom_tool(spec, loading_context):
+    if "class" in spec and spec["class"] == "CommandLineTool":
+        return CustomCommandlineTool(spec, loading_contextn)
+    return default_make_tool(spec, loading_context)
