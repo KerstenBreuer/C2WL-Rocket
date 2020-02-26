@@ -25,6 +25,7 @@ def main():
     )
     
     parser.add_argument('input_params',
+        nargs=argparse.REMAINDER,
         help="Provide input parameters in YAML or JSON format."
     )
     
