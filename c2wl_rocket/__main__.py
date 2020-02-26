@@ -45,6 +45,8 @@ def main():
         else SingleJobExecutor()
     job_executor.max_ram = job_executor.max_cores = float("inf")
     
+    print(vars(args))
+
     # hand arguments over to main exec function:
     cwltool.main.main(
         args=args,
