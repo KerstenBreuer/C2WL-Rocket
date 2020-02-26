@@ -3,6 +3,7 @@
 
 from cwltool.job import JobBase
 from cwltool.command_line_tool import CommandLineTool
+from cwltool.workflow import default_make_tool
 import json
 import functools
 
@@ -18,16 +19,15 @@ class CustomExecProfileJob(JobBase):
         requirements,  # type: List[Dict[Text, Text]]
         hints,  # type: List[Dict[Text, Text]]
         name,   # type: Text
-        # custom parameters:
-        tool # tool object
+        tool=None # tool object
     ):  # type: (...) -> None
-        super().__init__(self,
-                 builder=builder,
-                 joborder=joborder,
-                 make_path_mapper=make_path_mapper,
-                 requirements=requirements,
-                 hints=hints,
-                 name=name
+        super().__init__(
+                 builder,
+                 joborder,
+                 make_path_mapper,
+                 requirements,
+                 hints,
+                 name
         )
         self.tool = tool
 
@@ -77,5 +77,5 @@ class CustomCommandlineTool(CommandLineTool):
 ## custom tool creator function:
 def make_custom_tool(spec, loading_context):
     if "class" in spec and spec["class"] == "CommandLineTool":
-        return CustomCommandlineTool(spec, loading_contextn)
+        return CustomCommandlineTool(spec, loading_context)
     return default_make_tool(spec, loading_context)
