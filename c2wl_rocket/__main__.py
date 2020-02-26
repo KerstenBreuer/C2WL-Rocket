@@ -36,6 +36,7 @@ def main():
     args = copy(cwltool_default_args)
     args.workflow = parsed_args.cwl_document
     args.job_order = parsed_args.input_params
+    args.debug = True
 
     loading_context = cwltool.main.LoadingContext(vars(args))
     loading_context.construct_tool_object = make_custom_tool
