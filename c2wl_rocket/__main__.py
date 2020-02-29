@@ -3,7 +3,7 @@ import argparse
 import cwltool.main
 import cwltool.argparser
 from cwltool.executors import MultithreadedJobExecutor, SingleJobExecutor
-from .tool_runner import make_custom_tool
+from .tool_handling import make_custom_tool
 from copy import copy
 
 ## get cwltool default args:
