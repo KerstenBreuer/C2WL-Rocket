@@ -16,6 +16,11 @@ def main():
         description='Customizable CWL Rocket - A highly flexible CWL execution engine.'
     )
 
+    parser.add_argument("--debug", 
+        action="store_true", 
+        help="Print debugging level messages."
+    )
+
     parser.add_argument('-p', '--exec-profile',
         help="Specify an exec profile."
     )
@@ -36,7 +41,8 @@ def main():
     args = copy(cwltool_default_args)
     args.workflow = parsed_args.cwl_document
     args.job_order = parsed_args.input_params
-    args.debug = True
+    args.debug = parsed_args.debug
+
 
     loading_context = cwltool.main.LoadingContext(vars(args))
     loading_context.construct_tool_object = make_custom_tool
