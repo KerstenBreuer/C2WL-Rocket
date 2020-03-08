@@ -10,6 +10,7 @@
             "request":"launch",
             "program":"./c2wl_rocket.py",
             "args": [
+                "--debug",
                 "./touch.cwl",
                 "./test.yaml"
             ],
