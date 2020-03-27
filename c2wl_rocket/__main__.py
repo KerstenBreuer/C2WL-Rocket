@@ -1,11 +1,14 @@
 from __future__ import absolute_import
+import os
 import argparse
 import cwltool.main
 import cwltool.argparser
+import cwltool.utils
 from c2wl_rocket.exec_profile import LocalToolExec 
 from cwltool.executors import MultithreadedJobExecutor, SingleJobExecutor
 from .tool_handling import make_custom_tool
 from copy import copy
+import typing_extensions
 
 ## get cwltool default args:
 cwltool_ap = cwltool.argparser.arg_parser()
@@ -35,6 +38,51 @@ def main(args=None):
             nargs=argparse.REMAINDER,
             help="Provide input parameters in YAML or JSON format."
         )
+     
+        parser.add_argument("--outdir", 
+            type=typing_extensions.Text,
+            help="Output directory, default current directory",
+            default=os.path.abspath('.')
+        ) 
+        
+        exgroup = parser.add_mutually_exclusive_group()
+        exgroup.add_argument("--tmp-outdir-prefix", 
+            type=typing_extensions.Text,
+            help="Path prefix for intermediate output directories",
+            default=cwltool.utils.DEFAULT_TMP_PREFIX
+        )
+
+        exgroup.add_argument("--cachedir", 
+            type=typing_extensions.Text,
+            help="Directory to cache intermediate workflow outputs to avoid recomputing steps.",
+            default=""
+        )
+
+        exgroup = parser.add_mutually_exclusive_group()
+        exgroup.add_argument("--move-outputs", 
+            action="store_const", 
+            const="move", 
+            default="move",
+            help="Move output files to the workflow output directory and delete "
+            "intermediate output directories (default).", 
+            dest="move_outputs"
+        )
+
+        exgroup.add_argument("--leave-outputs", 
+            action="store_const", 
+            const="leave", 
+            default="move",
+            help="Leave output files in intermediate output directories.",
+            dest="move_outputs"
+        )
+
+        exgroup.add_argument("--copy-outputs", 
+            action="store_const", 
+            const="copy", 
+            default="move",
+            help="Copy output files to the workflow output directory, don't delete intermediate output directories.",
+            dest="move_outputs"
+        )
         
         args = parser.parse_args()
 
@@ -42,6 +90,12 @@ def main(args=None):
     cwltool_args = copy(cwltool_default_args)
     cwltool_args.workflow = args.cwl_document
     cwltool_args.job_order = args.input_params
+    cwltool_args.outdir = args.outdir
+    cwltool_args.tmp_outdir_prefix = args.tmp_outdir_prefix
+    cwltool_args.cachedir = args.cachedir
+    cwltool_args.move_outputs = args.move_outputs
+    cwltool_args.copy_outputs = args.copy_outputs
+    cwltool_args.leave_outputs = args.leave_outputs
     cwltool_args.debug = args.debug
 
 
@@ -60,7 +114,16 @@ def main(args=None):
         runtimeContext=runtime_context
     )
 
-def run(cwl_document, input_params, exec_profile=LocalToolExec, debug=False):
+def run(
+    cwl_document:str,
+    input_params:str, 
+    exec_profile=LocalToolExec, 
+    outdir=os.path.abspath('.'),
+    tmp_outdir_prefix=cwltool.utils.DEFAULT_TMP_PREFIX,
+    cachedir="",
+    move_outputs="move", # one of "move", "copy", or "leave"
+    debug=False
+):
     """
         Main API entry point. Executes c2wl_rocket.__main__.main"
     """

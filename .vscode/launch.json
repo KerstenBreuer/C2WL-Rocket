@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name":"shell_entry_point",
+            "name":"entry_point",
             "type":"python",
             "request":"launch",
             "program":"./c2wl_rocket.py",
