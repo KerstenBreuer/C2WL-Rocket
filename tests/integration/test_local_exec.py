@@ -23,4 +23,9 @@ def get_job(name_cwl, name_input=None):
     ]
 )
 def test_succeeding_jobs(cwl, inputs):
-    c2wl_rocket.__main__.run(cwl, inputs, debug=True)
+    c2wl_rocket.__main__.run(
+        cwl, 
+        inputs, 
+        outdir=test_out_dir,
+        debug=True
+    )

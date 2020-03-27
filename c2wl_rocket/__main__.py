@@ -94,8 +94,6 @@ def main(args=None):
     cwltool_args.tmp_outdir_prefix = args.tmp_outdir_prefix
     cwltool_args.cachedir = args.cachedir
     cwltool_args.move_outputs = args.move_outputs
-    cwltool_args.copy_outputs = args.copy_outputs
-    cwltool_args.leave_outputs = args.leave_outputs
     cwltool_args.debug = args.debug
 
 
@@ -131,7 +129,11 @@ def run(
         debug=debug,
         exec_profile=exec_profile,
         cwl_document=cwl_document,
-        input_params=[input_params]
+        input_params=[input_params],
+        outdir=outdir,
+        tmp_outdir_prefix=tmp_outdir_prefix,
+        cachedir=cachedir,
+        move_outputs=move_outputs
     )
     main(args)
 
