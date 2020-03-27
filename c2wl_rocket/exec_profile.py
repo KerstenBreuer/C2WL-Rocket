@@ -1,6 +1,5 @@
 from .worker import Worker
-from .error_handling import error_message
-from cwltool.loghandler import _logger as logger
+from .log_handling import logger, message, error_message
 from time import sleep
 import sys
 
@@ -76,20 +75,20 @@ class ExecProfileBase:
                     continue
 
                 logger.debug(
-                    f"[Exec Profile {method_name}] starting."
+                    message(f"[Exec Profile {method_name}]", "starting")
                 )
 
                 if method_name == "monitor":
                     while self.success is None:
                         logger.debug(
-                            f"[Exec Profile {method_name}] Task execution not finished yet. Waiting."
+                            message(f"[Exec Profile {method_name}]", "Task execution not finished yet. Waiting.")
                         )
                         sleep(self.seconds_between_monitor)
                         method()
                     
                     status = "success" if self.success else "failed"
                     logger.debug(
-                        f"[Exec Profile {method_name}] Task execution finished with status: {status}"
+                        message(f"[Exec Profile {method_name}]", "Task execution finished with status: {status}")
                     )
                 else:
                     method()
@@ -101,28 +100,27 @@ class ExecProfileBase:
                                 "and no \"monitor\" methdod has been defined. " + \
                                 "Have you forgot to set the output"
                             logger.debug(
-                                f"[Exec Profile {method_name}] Execution is started " + \
-                                "and continued in the background."
+                                message(f"[Exec Profile {method_name}]", "Execution is started and continued in the background.")
                             )
                         else:
                             status = "success" if self.success else "failed"
                             logger.debug(
-                                f"[Exec Profile {method_name}] Task execution finished with status: {status}"
+                                message(f"[Exec Profile {method_name}]", "Task execution finished with status: {status}")
                             )
                     else:
                         logger.debug(
-                            f"[Exec Profile {method_name}] completed."
+                            message(f"[Exec Profile {method_name}]", "completed")
                         )
 
 
             except AssertionError as e:
                 logger.error(
-                    f"[Exec Profile {method_name}] Error with known origin occured: {e}"
+                    error_message(f"Exec Profile {method_name}", e, is_known=True)
                 )
                 self.success = False
             except Exception as e:
                 logger.error(
-                    f"[Exec Profile {method_name}] Unkown error occured: {e}"
+                    error_message(f"Exec Profile {method_name}", e, is_known=False)
                 )
                 self.success = False
             
