@@ -5,14 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name":"entry_point",
+            "name":"shell_entry_point",
             "type":"python",
             "request":"launch",
             "program":"./c2wl_rocket.py",
             "args": [
                 "--debug",
-                "./touch.cwl",
-                "./test.yaml"
+                "./tests/integration/fixtures/touch.cwl",
+                "./tests/integration/fixtures/touch.yaml"
             ],
             "console":"integratedTerminal"
         }
