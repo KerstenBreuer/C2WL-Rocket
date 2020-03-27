@@ -47,7 +47,6 @@ class Worker():
         self.loading_context = LoadingContext()
         self.runtime_context = RuntimeContext()
 
-
         self.runtime_context.use_containers = use_containers
         self.runtime_context.user_space_docker_cmd = user_space_docker_cmd
         self.runtime_context.force_docker_pull = force_docker_pull
@@ -66,7 +65,13 @@ class Worker():
         self.out = {}
         
     def run(self):
-        self.out = self.callable_tool(**self.inputs)
+        try:
+            self.out = self.callable_tool(**self.inputs)
+            self.success = True
+        except:
+            self.success = False
+
+            
 
 
     

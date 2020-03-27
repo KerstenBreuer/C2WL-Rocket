@@ -9,6 +9,7 @@ from cwltool.workflow import default_make_tool
 import json
 import functools
 from .worker import Worker
+from .exec_profile import LocalToolExec
 
 
 class ExecProfileJob(JobBase):
@@ -47,23 +48,15 @@ class ExecProfileJob(JobBase):
             "commandline": self.command_line,
             "tool": tool_dict
         }
-        print(job_info)
-        worker = Worker(job_info)
-        worker.run()
-        outputs = worker.out
-        print(outputs)
+        
+        exec_profile = LocalToolExec(job_info)
 
-        # outputs = {
-        #     "test_file": {
-        #         "location": "file:///mnt/c/Users/kerst/OneDrive/home/C2WL-Rocket/test",
-        #         "basename": "test",
-        #         "class": "File",
-        #         "checksum": "sha1$da39a3ee5e6b4b0d3255bfef95601890afd80709",
-        #         "size": 0,
-        #         "path": "/mnt/c/Users/kerst/OneDrive/home/C2WL-Rocket/test"
-        #     }
-        # }
-        processStatus="success"
+        exec_profile.deploy()
+
+        outputs = exec_profile.out
+        processStatus = "success" if exec_profile.success \
+            else "permanentFail"
+
         with runtimeContext.workflow_eval_lock:
             self.output_callback(outputs, processStatus)
 
