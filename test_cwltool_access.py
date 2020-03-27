@@ -43,7 +43,6 @@ class CustomExecProfileJob(_cwltool_.job.JobBase):
             "commandline": self.command_line,
             "tool_dict": tool_dict
         }
-        print(job_info)
         outputs = {
             "test_file": {
                 "location": "file:///mnt/c/Users/kerst/OneDrive/home/C2WL-Rocket/test",

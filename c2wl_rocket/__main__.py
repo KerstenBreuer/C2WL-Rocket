@@ -50,8 +50,6 @@ def main():
     job_executor = MultithreadedJobExecutor() if args.parallel \
         else SingleJobExecutor()
     job_executor.max_ram = job_executor.max_cores = float("inf")
-    
-    print(vars(args))
 
     # hand arguments over to main exec function:
     cwltool.main.main(
