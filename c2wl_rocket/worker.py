@@ -7,13 +7,15 @@ from cwltool.factory import Factory
 from random import choice as random_choice
 from string import ascii_letters, digits
 from random import random
+import shutil
 
 class Worker():
     def __init__(
         self,
         job_info:dict,
-        workdir = None,
-        tmpdir = None,
+        workdir = None, # contains tmp and out dir 
+                        # if tmp not specified separately
+        tmpdir = None, 
         use_containers = True,
         user_space_docker_cmd = "",
         force_docker_pull = False,
@@ -24,7 +26,7 @@ class Worker():
         random_string = "".join([random_choice(ascii_letters + digits) for c in range(0,14)])
         self.tool = job_info["tool"]
         self.inputs = job_info["inputs"]
-        self.workdir = job_info["workdir"] if workdir \
+        self.workdir = workdir if workdir \
                 else os.path.join(os.getcwd(), random_string)
 
         if not os.path.exists(self.workdir):
@@ -70,6 +72,9 @@ class Worker():
             self.success = True
         except:
             self.success = False
+    
+    def delete_workdir(self):
+        shutil.rmtree(self.workdir)
 
             
 
