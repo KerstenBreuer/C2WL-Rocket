@@ -25,7 +25,8 @@ class ExecProfileJob(JobBase):
         requirements,  # type: List[Dict[Text, Text]]
         hints,  # type: List[Dict[Text, Text]]
         name,   # type: Text
-        tool=None # tool object
+        tool=None, # tool object
+        exec_profile_class=None
     ):  # type: (...) -> None
         super().__init__(
                  builder,
@@ -36,6 +37,8 @@ class ExecProfileJob(JobBase):
                  name
         )
         self.tool = tool
+        self.exec_profile_class = exec_profile_class if exec_profile_class is not None \
+            else LocalToolExec
 
     def run(
         self,
@@ -49,7 +52,7 @@ class ExecProfileJob(JobBase):
             "tool": tool_dict
         }
         
-        exec_profile = LocalToolExec(job_info)
+        exec_profile = self.exec_profile_class(job_info)
 
         exec_profile.deploy()
 
@@ -66,6 +69,18 @@ class ExecProfileCommandlineTool(CommandLineTool):
         Overwrite the make_job_runner
         so that it always returns the ExecProfileJob class:
     """
+    def __init__(
+        self, 
+        toolpath_object, 
+        loadingContext,
+        exec_profile_class=None
+    ):
+        super().__init__(
+            toolpath_object, 
+            loadingContext
+        )
+        self.exec_profile_class = exec_profile_class
+
     def make_job_runner(self,
         runtimeContext       # type: RuntimeContext
     ):  # type: (...) -> Type[JobBase]
@@ -73,16 +88,17 @@ class ExecProfileCommandlineTool(CommandLineTool):
 
         return functools.partial(
             ExecProfileJob, 
-            tool=self.tool # bind tool object to job
+            tool=self.tool, # bind tool object to job
+            exec_profile_class=self.exec_profile_class # bind custom exec profile class to job
         )
 
 
-def make_custom_tool(spec, loading_context):
+def make_custom_tool(spec, loading_context, exec_profile_class):
     """
         custom tool maker: 
             only use ExecProfileCommandlineTool if spec if the spec is a "CommandLineTool",
             otherwise use the cwltool's standard tool maker
     """
     if "class" in spec and spec["class"] == "CommandLineTool":
-        return ExecProfileCommandlineTool(spec, loading_context)
+        return ExecProfileCommandlineTool(spec, loading_context, exec_profile_class)
     return default_make_tool(spec, loading_context)

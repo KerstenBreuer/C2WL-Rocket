@@ -11,6 +11,7 @@ from c2wl_rocket.worker import Worker
 class LocalToolExec(ExecProfileBase):
     def prepare(self):
         shutil.rmtree(test_out_dir)
+        os.makedirs(test_out_dir)
 
     def execute(self):
         self.async_exec = False

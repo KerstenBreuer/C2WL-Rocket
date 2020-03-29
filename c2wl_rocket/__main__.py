@@ -12,6 +12,7 @@ from copy import copy
 import typing_extensions
 from inspect import isclass
 import importlib
+import functools
 
 ## get cwltool default args:
 cwltool_ap = cwltool.argparser.arg_parser()
@@ -176,7 +177,10 @@ def main(args=None):
 
 
     loading_context = cwltool.main.LoadingContext(vars(cwltool_args))
-    loading_context.construct_tool_object = make_custom_tool
+    loading_context.construct_tool_object = functools.partial(
+        make_custom_tool, 
+        exec_profile_class=args.exec_profile
+    )
     runtime_context = cwltool.main.RuntimeContext(vars(cwltool_args))
     job_executor = MultithreadedJobExecutor() if cwltool_args.parallel \
         else SingleJobExecutor()

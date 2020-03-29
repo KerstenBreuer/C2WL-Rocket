@@ -4,6 +4,8 @@ from cwltool.executors import SingleJobExecutor
 from cwltool.context import LoadingContext, RuntimeContext
 from cwltool.factory import Factory
 
+from .log_handling import error_message
+
 from random import choice as random_choice
 from string import ascii_letters, digits
 from random import random
@@ -26,11 +28,19 @@ class Worker():
         random_string = "".join([random_choice(ascii_letters + digits) for c in range(0,14)])
         self.tool = job_info["tool"]
         self.inputs = job_info["inputs"]
-        self.workdir = workdir if workdir \
-                else os.path.join(os.getcwd(), random_string)
+        if workdir is None:
+            workdir = os.getcwd()
 
-        if not os.path.exists(self.workdir):
-            os.makedirs(self.workdir)
+        assert (not os.path.exists(workdir)) or os.path.isdir(workdir), \
+            error_message(
+                "worker",
+                f"Message workdir exists but is not a directory: {workdir}",
+                is_known=True
+            )
+
+        self.workdir = workdir if not os.path.exists(workdir) \
+            else os.path.join(workdir, random_string)
+        os.makedirs(self.workdir)
         
         self.inputs_file = os.path.join(self.workdir, "inputs.json")
         with open(self.inputs_file, "w") as inp_file:
