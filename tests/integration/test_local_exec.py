@@ -46,7 +46,7 @@ def test_cmdl_entry_point_jobs(cwl, inputs, success_expected):
                 c2wl_cmdl_entry_point,
                 "--debug",
                 "--exec-profile",
-                os.path.join(dir_of_this_script, "exec_profiles.py") + ":LocalToolExec"
+                os.path.join(dir_of_this_script, "exec_profiles.py") + ":LocalToolExec",
                 "--outdir",
                 test_out_dir,
                 cwl,
