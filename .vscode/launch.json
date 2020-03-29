@@ -11,6 +11,10 @@
             "program":"./c2wl_rocket.py",
             "args": [
                 "--debug",
+                "--exec-profile",
+                "./tests/integration/exec_profiles.py:LocalToolExec",
+                "--outdir",
+                "./test_out",
                 "./tests/integration/fixtures/touch.cwl",
                 "./tests/integration/fixtures/touch.yaml"
             ],
