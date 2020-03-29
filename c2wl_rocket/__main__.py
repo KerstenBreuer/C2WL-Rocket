@@ -4,11 +4,14 @@ import argparse
 import cwltool.main
 import cwltool.argparser
 import cwltool.utils
-from c2wl_rocket.exec_profile import LocalToolExec 
+from c2wl_rocket.exec_profile import ExecProfileBase, LocalToolExec 
 from cwltool.executors import MultithreadedJobExecutor, SingleJobExecutor
 from .tool_handling import make_custom_tool
+from .log_handling import error_message
 from copy import copy
 import typing_extensions
+from inspect import isclass
+import importlib
 
 ## get cwltool default args:
 cwltool_ap = cwltool.argparser.arg_parser()
@@ -27,7 +30,15 @@ def main(args=None):
         )
 
         parser.add_argument('-p', '--exec-profile',
-            help="Specify an exec profile."
+            help="""Specify an exec profile.
+                    Please specify the name to a python module and
+                    a contained exec profile class sperated by \":\" 
+                    (e.g. the default \"c2wl_rocket.exec_profile:LocalToolExec\").
+                    Alternatively you can specify the full path to a python file
+                    containing an exec profile class 
+                    (e.g. \"/path/to/my/exec_profiles.py:CustomExec\").
+                """,
+            default="c2wl_rocket.exec_profile:LocalToolExec"
         )
 
         parser.add_argument('cwl_document',
@@ -80,11 +91,78 @@ def main(args=None):
             action="store_const", 
             const="copy", 
             default="move",
-            help="Copy output files to the workflow output directory, don't delete intermediate output directories.",
+            help="""
+                Copy output files to the workflow output directory, 
+                don't delete intermediate output directories.
+            """,
             dest="move_outputs"
         )
         
         args = parser.parse_args()
+
+
+    if isinstance(args.exec_profile, str):
+        exec_profile_invalid_message = error_message(
+            "main",
+            """
+                The specified exec profile is invalid.
+                Please either specify a class inheriting from 
+                ExecProfileBase at c2wl_rocket.execprofile or
+                if using the commandline specify the name or path
+                to a module that containes such a class.
+                Please see the commandline help for details.
+            """,
+            is_known=True
+        )
+
+        assert ":" in args.exec_profile, \
+             exec_profile_invalid_message
+        exec_profile_module_name = args.exec_profile.split(":")[0]
+        exec_profile_class_name = args.exec_profile.split(":")[1]
+
+        try:
+            exec_profile_module = importlib.import_module(exec_profile_module_name)
+        except:
+            try:
+                spec = importlib.util.spec_from_file_location(
+                    "exec_profile_module", 
+                    exec_profile_module_name
+                )
+                exec_profile_module = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(exec_profile_module)
+            except:
+                raise AssertionError(
+                    error_message(
+                        "main",
+                        """
+                            The specified exec profile module \"{exec_profile_module_name}\"
+                            could not be imported.
+                        """,
+                        is_known=True
+                    )
+                )
+        
+        assert hasattr(exec_profile_module, exec_profile_class_name), \
+            error_message(
+                "main",
+                f"""
+                    The specified exec profile module \"{exec_profile_module_name}\"
+                    has no class \"{exec_profile_class_name}\".
+                """,
+                is_known=True
+            )
+        args.exec_profile = getattr(exec_profile_module, exec_profile_class_name)
+        
+        
+    assert isclass(args.exec_profile) and issubclass(args.exec_profile, ExecProfileBase), \
+            error_message(
+                "main",
+                """
+                    The specified exec profile class does not inherit
+                    from ExecProfileBase at c2wl_rocket.execprofile.
+                """,
+                is_known=True
+            )
 
 
     cwltool_args = copy(cwltool_default_args)
@@ -115,7 +193,8 @@ def main(args=None):
 def run(
     cwl_document:str,
     input_params:str, 
-    exec_profile=LocalToolExec, 
+    exec_profile=LocalToolExec, # please note here class not 
+                                # the path to the module is required
     outdir=os.path.abspath('.'),
     tmp_outdir_prefix=cwltool.utils.DEFAULT_TMP_PREFIX,
     cachedir="",
