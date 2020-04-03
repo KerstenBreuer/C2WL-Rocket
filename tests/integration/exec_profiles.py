@@ -17,7 +17,8 @@ class LocalToolExec(ExecProfileBase):
         self.async_exec = False
         worker = Worker(
             self.job_info,
-            workdir=test_out_dir
+            workdir=test_out_dir,
+            use_container=False
         )
 
         worker.run()

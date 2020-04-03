@@ -18,10 +18,10 @@ class Worker():
         workdir = None, # contains tmp and out dir 
                         # if tmp not specified separately
         tmpdir = None, 
-        use_containers = True,
+        use_container = True,
         user_space_docker_cmd = "",
         force_docker_pull = False,
-        singularity = True,
+        singularity = False,
         debug = False,
         default_container = ""
     ):
@@ -59,13 +59,13 @@ class Worker():
         self.loading_context = LoadingContext()
         self.runtime_context = RuntimeContext()
 
-        self.runtime_context.use_containers = use_containers
+        self.runtime_context.use_container = use_container
         self.runtime_context.user_space_docker_cmd = user_space_docker_cmd
         self.runtime_context.force_docker_pull = force_docker_pull
         self.runtime_context.singularity = singularity
-        self.runtime_context.use_containers = use_containers
-        self.runtime_context.use_containers = use_containers
-        self.runtime_context.use_containers = use_containers
+        self.runtime_context.use_container = use_container
+        self.runtime_context.use_container = use_container
+        self.runtime_context.use_container = use_container
 
 
         fac = Factory(
