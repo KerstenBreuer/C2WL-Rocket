@@ -1,0 +1,20 @@
+
+sample_id: "tiny_test"
+fastq1:
+  class: File
+  path: ./trim_and_map_tiny_test_data/sample1_1.fastq
+fastq2:
+  class: File
+  path: ./trim_and_map_tiny_test_data/sample1_2.fastq
+genome:
+  class: File
+  path: ./trim_and_map_tiny_test_data/ref_genome.fa
+genome_info:
+  class: File
+  path: ./trim_and_map_tiny_test_data/ref_genome.chrom.sizes
+macs2_genome_size: "199"
+adapter1: auto
+adapter2: auto
+fragment_size: 10
+effective_genome_size: 199
+is_paired_end: true

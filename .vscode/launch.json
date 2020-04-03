@@ -19,6 +19,22 @@
                 "./tests/integration/fixtures/touch.yaml"
             ],
             "console":"integratedTerminal"
+        },
+        {
+            "name":"entry_point_real_wf",
+            "type":"python",
+            "request":"launch",
+            "program":"./c2wl_rocket.py",
+            "args": [
+                "--debug",
+                "--exec-profile",
+                "./tests/integration/exec_profiles.py:LocalToolExec",
+                "--outdir",
+                "./test_out",
+                "./tests/integration/fixtures/trim_and_map.cwl",
+                "./tests/integration/fixtures/trim_and_map.yaml"
+            ],
+            "console":"integratedTerminal"
         }
     ]
 }

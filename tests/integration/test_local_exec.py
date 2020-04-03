@@ -17,26 +17,28 @@ def get_job(name_cwl, name_input=None):
     return cwl, inputs, success_expected
 
 
-@pytest.mark.parametrize(
-    "cwl, inputs, success_expected", 
-    [
-        get_job("touch")
-    ]
-)
-def test_api_entry_point_jobs(cwl, inputs, success_expected):
-    c2wl_rocket.__main__.run(
-        cwl, 
-        inputs, 
-        outdir=test_out_dir,
-        exec_profile=LocalToolExec,
-        debug=True
-    )
+# @pytest.mark.parametrize(
+#     "cwl, inputs, success_expected", 
+#     [
+#         get_job("touch"),
+#         get_job("trim_and_map")
+#     ]
+# )
+# def test_api_entry_point_jobs(cwl, inputs, success_expected):
+#     c2wl_rocket.__main__.run(
+#         cwl, 
+#         inputs, 
+#         outdir=test_out_dir,
+#         exec_profile=LocalToolExec,
+#         debug=True
+#     )
 
 
 @pytest.mark.parametrize(
     "cwl, inputs, success_expected", 
     [
-        get_job("touch")
+        get_job("touch"),
+        get_job("trim_and_map")
     ]
 )
 def test_cmdl_entry_point_jobs(cwl, inputs, success_expected):
