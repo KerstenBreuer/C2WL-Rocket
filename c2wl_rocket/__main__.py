@@ -13,6 +13,7 @@ import typing_extensions
 from inspect import isclass
 import importlib
 import functools
+import yaml
 
 ## get cwltool default args:
 cwltool_ap = cwltool.argparser.arg_parser()
@@ -177,9 +178,18 @@ def main(args=None):
 
 
     loading_context = cwltool.main.LoadingContext(vars(cwltool_args))
+    with open(args.cwl_document, mode="r") as cwl:
+        cwl_content = yaml.load(cwl)
+    assert "cwlVersion" in cwl_content.keys(), error_message(
+        "main",
+        "No cwlVersion as specified in the CWL document.",
+        is_known=True
+    )
+    workflow_metadata = {"cwlVersion": cwl_content["cwlVersion"]}
     loading_context.construct_tool_object = functools.partial(
         make_custom_tool, 
-        exec_profile_class=args.exec_profile
+        exec_profile_class=args.exec_profile,
+        workflow_metadata=workflow_metadata
     )
     runtime_context = cwltool.main.RuntimeContext(vars(cwltool_args))
     job_executor = MultithreadedJobExecutor() if cwltool_args.parallel \
@@ -193,6 +203,9 @@ def main(args=None):
         loadingContext=loading_context,
         runtimeContext=runtime_context
     )
+
+    
+
 
 def run(
     cwl_document:str,

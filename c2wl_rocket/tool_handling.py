@@ -26,7 +26,8 @@ class ExecProfileJob(JobBase):
         hints,  # type: List[Dict[Text, Text]]
         name,   # type: Text
         tool=None, # tool object
-        exec_profile_class=None
+        exec_profile_class=None,
+        workflow_metadata=None
     ):  # type: (...) -> None
         super().__init__(
                  builder,
@@ -39,17 +40,21 @@ class ExecProfileJob(JobBase):
         self.tool = tool
         self.exec_profile_class = exec_profile_class if exec_profile_class is not None \
             else LocalToolExec
+        self.workflow_metadata = workflow_metadata
 
     def run(
         self,
         runtimeContext     # type: RuntimeContext
     ):  # type: (...) -> None
         tool_dict = json.loads(json.dumps(self.tool))
+        if "cwlVersion" not in tool_dict:
+            tool_dict["cwlVersion"] = self.workflow_metadata["cwlVersion"]
         job_info = {
             "inputs": self.joborder,
             "resources": self.builder.resources,
             "commandline": self.command_line,
-            "tool": tool_dict
+            "tool": tool_dict,
+            "workflow_metadata": self.workflow_metadata
         }
         
         exec_profile = self.exec_profile_class(job_info)
@@ -73,13 +78,15 @@ class ExecProfileCommandlineTool(CommandLineTool):
         self, 
         toolpath_object, 
         loadingContext,
-        exec_profile_class=None
+        exec_profile_class=None,
+        workflow_metadata=None
     ):
         super().__init__(
             toolpath_object, 
             loadingContext
         )
         self.exec_profile_class = exec_profile_class
+        self.workflow_metadata = workflow_metadata
 
     def make_job_runner(self,
         runtimeContext       # type: RuntimeContext
@@ -89,16 +96,22 @@ class ExecProfileCommandlineTool(CommandLineTool):
         return functools.partial(
             ExecProfileJob, 
             tool=self.tool, # bind tool object to job
-            exec_profile_class=self.exec_profile_class # bind custom exec profile class to job
+            exec_profile_class=self.exec_profile_class, # bind custom exec profile class to job
+            workflow_metadata=self.workflow_metadata
         )
 
 
-def make_custom_tool(spec, loading_context, exec_profile_class):
+def make_custom_tool(spec, loading_context, exec_profile_class, workflow_metadata):
     """
         custom tool maker: 
             only use ExecProfileCommandlineTool if spec if the spec is a "CommandLineTool",
             otherwise use the cwltool's standard tool maker
     """
     if "class" in spec and spec["class"] == "CommandLineTool":
-        return ExecProfileCommandlineTool(spec, loading_context, exec_profile_class)
+        return ExecProfileCommandlineTool(
+            spec, 
+            loading_context, 
+            exec_profile_class, 
+            workflow_metadata
+        )
     return default_make_tool(spec, loading_context)
