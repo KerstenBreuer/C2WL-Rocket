@@ -49,15 +49,14 @@ class ExecProfileJob(JobBase):
         tool_dict = json.loads(json.dumps(self.tool))
         if "cwlVersion" not in tool_dict:
             tool_dict["cwlVersion"] = self.workflow_metadata["cwlVersion"]
-        job_info = {
-            "inputs": self.joborder,
-            "resources": self.builder.resources,
-            "commandline": self.command_line,
-            "tool": tool_dict,
-            "workflow_metadata": self.workflow_metadata
-        }
         
-        exec_profile = self.exec_profile_class(job_info)
+        exec_profile = self.exec_profile_class(
+            tool=tool_dict,
+            inputs=self.joborder,
+            resources=self.builder.resources,
+            commandline=self.command_line,
+            workflow_metadata=self.workflow_metadata
+        )
 
         exec_profile.deploy()
 

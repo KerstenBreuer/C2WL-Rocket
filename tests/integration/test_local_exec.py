@@ -38,7 +38,7 @@ def get_job(name_cwl, name_input=None):
     "cwl, inputs, success_expected", 
     [
         get_job("touch"),
-        get_job("trim_and_map")
+        get_job("touch_fail")
     ]
 )
 def test_cmdl_entry_point_jobs(cwl, inputs, success_expected):
@@ -58,16 +58,15 @@ def test_cmdl_entry_point_jobs(cwl, inputs, success_expected):
         )
     exit_code = p.wait()
     stderr = str(p.stderr.read()).split("\\n")
-    
     # check final status message in log:
-    final_status = stderr[-2]
+    final_status = "\n".join(stderr[-2:-1])
     assert "Final process status" in final_status, \
         f"No final process status detected in log."
     if success_expected:
-        assert final_status == "Final process status is success", \
+        assert "Final process status is success" in final_status, \
             f"Success expected but final status message was: \"{final_status}\""
     else:
-        assert final_status == "Final process status is permanentFail", \
+        assert "Final process status is permanentFail" in final_status, \
             f"Fail expected but final status message was: \"{final_status}\""
     
     # check exit code:

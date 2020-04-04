@@ -14,7 +14,8 @@ import shutil
 class Worker():
     def __init__(
         self,
-        job_info:dict,
+        tool:dict,
+        inputs:dict,
         workdir = None, # contains tmp and out dir 
                         # if tmp not specified separately
         tmpdir = None, 
@@ -26,8 +27,8 @@ class Worker():
         default_container = ""
     ):
         random_string = "".join([random_choice(ascii_letters + digits) for c in range(0,14)])
-        self.tool = job_info["tool"]
-        self.inputs = job_info["inputs"]
+        self.tool = tool
+        self.inputs = inputs
         if workdir is None:
             workdir = os.getcwd()
 

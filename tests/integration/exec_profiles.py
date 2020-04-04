@@ -16,7 +16,8 @@ class LocalToolExec(ExecProfileBase):
     def execute(self):
         self.async_exec = False
         worker = Worker(
-            self.job_info,
+            tool=self.tool,
+            inputs=self.inputs,
             workdir=test_out_dir,
             use_container=False
         )

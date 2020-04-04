@@ -19,13 +19,16 @@ class ExecProfileBase:
 
     def __init__(
         self,
-        job_info:dict
+        tool:dict,
+        inputs:dict,
+        resources:dict,
+        commandline:str,
+        workflow_metadata: dict
     ):
-        self.job_info = job_info
-        self.tool = job_info["tool"]
-        self.inputs = job_info["inputs"]
-        self.commandline = job_info["commandline"]
-        self.resources = job_info["resources"]
+        self.tool = tool
+        self.inputs = inputs
+        self.commandline = commandline
+        self.resources = resources
         self.out = {}
         self.success = None # indicates success of task execution:
                             #   - None if not completed yet
@@ -131,7 +134,8 @@ class LocalToolExec(ExecProfileBase):
     def execute(self):
         self.async_exec = False
         worker = Worker(
-            self.job_info
+            tool=self.tool,
+            inputs=self.inputs
         )
 
         worker.run()
