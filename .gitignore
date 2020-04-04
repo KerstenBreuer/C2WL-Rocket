@@ -1,2 +1,4 @@
 *.pyc
 /test_out
+/build
+/c2wl_rocket.egg-info
