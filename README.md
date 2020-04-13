@@ -7,8 +7,8 @@
         <img src="logo/logo_for_light_barckground.svg" width="150px">
       </td>
       <td>
-         An customizeable execution engine for the Common Workflow Language (CWL)
-         with highly flexible task-level execution especially useful for cloud applications.
+         A customizable execution engine for the Common Workflow Language (CWL)
+         with highly flexible task-level execution, especially useful for cloud applications.
       </td>
     </tr>
   </table>
@@ -21,4 +21,4 @@ Please note, C2WL-Rocket is in pre-alpha state.
 While a more extensive guide is one the way, please refer to `c2wl-rocket --help`.
 
 ## Licence:
-This repository is free to use or modify under the Apache 2.0 Licence.
+This repository is free to use and modify under the Apache 2.0 Licence.
