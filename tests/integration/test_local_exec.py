@@ -4,24 +4,17 @@ import argparse
 import shutil
 import subprocess
 from . import test_out_dir, package_root, fixtures_dir, \
-    c2wl_cmdl_entry_point, dir_of_this_script
+    c2wl_cmdl_entry_point, dir_of_this_script, get_cwl_job
 sys.path.append(package_root)
 from .exec_profiles import LocalToolExec
 import c2wl_rocket.__main__
-
-def get_job(name_cwl, name_input=None):
-    name_input = name_input if name_input is not None else name_cwl
-    inputs = os.path.join(fixtures_dir, f"{name_input}.yaml") 
-    cwl = os.path.join(fixtures_dir, f"{name_cwl}.cwl") 
-    success_expected = "fail" not in name_cwl and "fail" not in name_input
-    return cwl, inputs, success_expected
 
 
 # @pytest.mark.parametrize(
 #     "cwl, inputs, success_expected", 
 #     [
-#         get_job("touch"),
-#         get_job("trim_and_map")
+#         get_cwl_job("touch"),
+#         get_cwl_job("trim_and_map")
 #     ]
 # )
 # def test_api_entry_point_jobs(cwl, inputs, success_expected):
@@ -37,8 +30,8 @@ def get_job(name_cwl, name_input=None):
 @pytest.mark.parametrize(
     "cwl, inputs, success_expected", 
     [
-        get_job("touch"),
-        get_job("touch_fail")
+        get_cwl_job("touch"),
+        get_cwl_job("touch_fail")
     ]
 )
 def test_cmdl_entry_point_jobs(cwl, inputs, success_expected):
