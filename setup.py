@@ -28,6 +28,8 @@ setup(
     },
     install_requires=[
                       'PyYAML',
+                      'flask>=1.0.0',
+                      'flask-restful',
                       'cwltool==1.0.20180809224403'         
                       ],
     classifiers=[
