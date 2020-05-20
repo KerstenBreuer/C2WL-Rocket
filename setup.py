@@ -30,7 +30,8 @@ setup(
                       'PyYAML',
                       'flask>=1.0.0',
                       'flask-restful',
-                      'cwltool==1.0.20180809224403'         
+                      'cwltool==1.0.20180809224403',
+                      "requests"         
                       ],
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
