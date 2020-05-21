@@ -5,7 +5,7 @@ import subprocess
 import yaml
 from . import *
 sys.path.append(package_root)
-from c2wl_rocket.worker import Worker
+from c2wl_rocket.worker import Task
 
 
 @pytest.mark.parametrize(
@@ -15,7 +15,7 @@ from c2wl_rocket.worker import Worker
         # get_cwl_job("touch_fail")
     ]
 )
-def test_basic_worker_process(cwl, inputs, success_expected):
+def test_basic_task_process(cwl, inputs, success_expected):
     cleanup()
     
     with open(cwl, "r") as cwl_file:
@@ -23,7 +23,7 @@ def test_basic_worker_process(cwl, inputs, success_expected):
     with open(inputs, "r") as input_file:
         inputs_dict = yaml.safe_load( input_file.read() )
 
-    worker = Worker(
+    task = Task(
         tool=tool_dict,
         inputs=inputs_dict,
         workdir=test_out_dir,
@@ -31,10 +31,10 @@ def test_basic_worker_process(cwl, inputs, success_expected):
         debug=True
     )
 
-    worker.run()
+    task.run()
 
-    assert worker.success == success_expected, \
-        f"Success status didn't met expections: {str(worker.success)}"
+    assert task.success == success_expected, \
+        f"Success status didn't met expections: {str(task.success)}"
 
     # expected_output = 
     # assert os.path.join()

@@ -5,7 +5,7 @@ package_root = os.path.join(dir_of_this_script, "..", "..")
 test_out_dir = os.path.join(package_root, "test_out")
 sys.path.append(package_root)
 from c2wl_rocket.exec_profile import ExecProfileBase
-from c2wl_rocket.worker import Worker
+from c2wl_rocket.worker import Task
 
 
 class LocalToolExec(ExecProfileBase):
@@ -15,13 +15,13 @@ class LocalToolExec(ExecProfileBase):
 
     def execute(self):
         self.async_exec = False
-        worker = Worker(
+        task = Task(
             tool=self.tool,
             inputs=self.inputs,
             workdir=test_out_dir,
             use_container=False
         )
 
-        worker.run()
-        self.out = worker.out
-        self.success = worker.success
+        task.run()
+        self.out = task.out
+        self.success = task.success

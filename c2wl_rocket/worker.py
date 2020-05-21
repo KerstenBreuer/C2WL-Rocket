@@ -15,7 +15,7 @@ import shutil
 from flask_restful import Resource, Api
 
 
-class Worker():
+class Task():
     def __init__(
         self,
         tool:dict,
@@ -38,7 +38,7 @@ class Worker():
 
         assert (not os.path.exists(workdir)) or os.path.isdir(workdir), \
             error_message(
-                "worker",
+                "task",
                 f"Message workdir exists but is not a directory: {workdir}",
                 is_known=True
             )
@@ -95,7 +95,7 @@ class Worker():
             
 ## This is only relevant when using worker via a REST api:
 #############################################################
-worker = None
+task = None
 
 class SubmitTask(Resource):
     def post(
@@ -112,8 +112,8 @@ class SubmitTask(Resource):
         default_container = ""
     ):
         try:
-            global worker 
-            worker = Worker(
+            global task 
+            task = Task(
                 tool = tool,
                 inputs = inputs,
                 workdir = workdir,
@@ -125,15 +125,15 @@ class SubmitTask(Resource):
                 debug = debug,
                 default_container = default_container
             )
-            worker.run()
+            task.run()
             return {"success": True}
         except Exception as e:
             return {"success": False, "error": str(e)}
         
 class GetStatus(Resource):
     def get(self):
-        out = worker.out
-        status = "finished successfully" if worker.success else \
+        out = task.out
+        status = "finished successfully" if task.success else \
             "failed"
         return {
             "task_status": status,
@@ -141,7 +141,7 @@ class GetStatus(Resource):
         }
 
 
-def start_remote_worker(web_server_host, web_server_port):
+def start_worker(web_server_host, web_server_port):
     app = create_app(
         web_server_host=web_server_host,
         web_server_port=web_server_port
