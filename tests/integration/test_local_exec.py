@@ -39,6 +39,7 @@ def test_cmdl_entry_point_jobs(cwl, inputs, success_expected):
             [
                 "python3",
                 c2wl_cmdl_entry_point,
+                "launch",
                 "--debug",
                 "--exec-profile",
                 os.path.join(dir_of_this_script, "exec_profiles.py") + ":LocalToolExec",

@@ -10,6 +10,7 @@
             "request":"launch",
             "program":"./c2wl_rocket.py",
             "args": [
+                "launch",
                 "--debug",
                 "--exec-profile",
                 "./tests/integration/exec_profiles.py:LocalToolExec",
@@ -26,6 +27,7 @@
             "request":"launch",
             "program":"./c2wl_rocket.py",
             "args": [
+                "launch",
                 "--debug",
                 "--exec-profile",
                 "./tests/integration/exec_profiles.py:LocalToolExec",

@@ -20,8 +20,8 @@ class SubmitTask(Resource):
         default_container = ""
     ):
         try:
-            global task 
-            task = Task(
+            global task_executor 
+            task_executor = TaskExecutor(
                 tool = tool,
                 inputs = inputs,
                 workdir = workdir,
@@ -33,23 +33,28 @@ class SubmitTask(Resource):
                 debug = debug,
                 default_container = default_container
             )
-            task.run()
+            task_executor.run()
             return {"success": True}
         except Exception as e:
             return {"success": False, "error": str(e)}
         
-class GetStatus(Resource):
+class TaskStatus(Resource):
     def get(self):
-        out = task.out
-        status = "finished successfully" if task.success else \
-            "failed"
-        return {
-            "task_status": status,
-            "task_output": out
-        }
+        data = {}
+        if task_executor is None:
+            status = "No task submitted yet."
+        else:
+            data["task_output"] = task_executor.out
+            status = "finished successfully" if task_executor.success else \
+                "failed"
+        data["task_status"] = status
+        return data
 
 
-def start_worker(web_server_host, web_server_port):
+def start(web_server_host, web_server_port):
+    """
+        Starts a remote worker service.
+    """
     app = create_app(
         web_server_host=web_server_host,
         web_server_port=web_server_port
@@ -57,6 +62,6 @@ def start_worker(web_server_host, web_server_port):
 
     api = Api(app)
     api.add_resource(SubmitTask, '/submit_task')
-    api.add_resource(GetStatus, '/get_status')
+    api.add_resource(TaskStatus, '/task_status')
     
     app.run()
