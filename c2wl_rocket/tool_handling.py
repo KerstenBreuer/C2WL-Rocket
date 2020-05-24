@@ -8,7 +8,7 @@ from cwltool.command_line_tool import CommandLineTool
 from cwltool.workflow import default_make_tool
 import json
 import functools
-from .worker import Task
+from .task_executor import TaskExecutor
 from .exec_profile import LocalToolExec
 
 

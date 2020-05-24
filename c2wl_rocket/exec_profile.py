@@ -1,4 +1,4 @@
-from .worker import Task
+from .task_executor import TaskExecutor
 from .log_handling import logger, message, error_message
 from time import sleep
 import sys
@@ -133,11 +133,11 @@ class ExecProfileBase:
 class LocalToolExec(ExecProfileBase):
     def execute(self):
         self.async_exec = False
-        task = Task(
+        task_executor = TaskExecutor(
             tool=self.tool,
             inputs=self.inputs
         )
 
         task.run()
-        self.out = task.out
+        self.out = task_executor.out
         self.success = task.success

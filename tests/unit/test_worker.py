@@ -5,7 +5,7 @@ import subprocess
 import yaml
 from . import *
 sys.path.append(package_root)
-from c2wl_rocket.worker import Task
+from c2wl_rocket.task_executor import TaskExecutor
 
 
 @pytest.mark.parametrize(
@@ -23,7 +23,7 @@ def test_basic_task_process(cwl, inputs, success_expected):
     with open(inputs, "r") as input_file:
         inputs_dict = yaml.safe_load( input_file.read() )
 
-    task = Task(
+    task_executor = TaskExecutor(
         tool=tool_dict,
         inputs=inputs_dict,
         workdir=test_out_dir,
@@ -31,10 +31,10 @@ def test_basic_task_process(cwl, inputs, success_expected):
         debug=True
     )
 
-    task.run()
+    task_executor.run()
 
-    assert task.success == success_expected, \
-        f"Success status didn't met expections: {str(task.success)}"
+    assert task_executor.success == success_expected, \
+        f"Success status didn't met expections: {str(task_executor.success)}"
 
     # expected_output = 
     # assert os.path.join()
